@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
@@ -8,10 +6,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     name: 'NATS_SERVICE',
     transport: Transport.NATS,
     options: {
-      servers : ['nats://nats', 'nats://localhost:4222']
+      servers : ['nats://nats']
     }
   }])],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
