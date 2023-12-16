@@ -17,5 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
+  },
+  "watchOptions": { // this is only for dev mode, we can take it out in prod mode
+    // Use a dynamic polling instead of system’s native events for file changes.
+    "watchFile": "dynamicPriorityPolling",
+    "watchDirectory": "dynamicPriorityPolling",
+    "excludeDirectories": ["**/node_modules", "dist"]
   }
 }
