@@ -2,8 +2,8 @@ import { Controller, Post, Inject, Body } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateUserDto } from "./dtos/CreateUser.dto";
 
-@Controller('users')
-export class UsersController {
+@Controller('auth')
+export class AuthController {
     constructor(@Inject('NATS_SERVICE') private natsClient: ClientProxy){}
 
     // not interacting with a database in this controller
