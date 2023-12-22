@@ -1,4 +1,4 @@
-import { Controller, Post, Inject, Body } from "@nestjs/common";
+import { Controller, Get, Post, Inject, Body, Param } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateUserDto } from "./dtos/CreateUser.dto";
 
@@ -9,9 +9,14 @@ export class UsersController {
     // not interacting with a database in this controller
     // but interact with the NATS service
     // need to inject NATS service in this class
-    @Post()
+    @Post('createUser')
     createUser(@Body() createUserDto: CreateUserDto) {
         console.log(createUserDto)
          return this.natsClient.send({cmd: 'createUser'}, createUserDto)
+    }
+
+    @Get(':id')
+    getUserById(@Param('id') id: number){
+        return this.natsClient.send({cmd: 'getUserById'}, {userId: id})
     }
 }
