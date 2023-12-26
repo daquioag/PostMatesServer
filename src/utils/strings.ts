@@ -4,6 +4,7 @@ export const USER_NOT_FOUND = 'User not found';
 export const USER_FOUND = 'User found';
 export const INVALID_PASSWORD = 'Invalid password';
 export const WRONG_PASSWORD = 'Wrong password';
+export const INVALID_CREDENTIALS = 'Invalid email or password';
 
 export const INTERNAL_SERVER_ERROR = 'Internal Server Error';
 export const LOGOUT_MESSAGE = (email: string) => `Logging out of ${email}'s account`;

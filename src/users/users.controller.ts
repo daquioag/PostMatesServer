@@ -9,7 +9,7 @@ export class UsersController {
     // not interacting with a database in this controller
     // but interact with the NATS service
     // need to inject NATS service in this class
-    @Post('createUser')
+    @Post('create')
     createUser(@Body() createUserDto: CreateUserDto) {
         console.log(createUserDto)
          return this.natsClient.send({cmd: 'createUser'}, createUserDto)
