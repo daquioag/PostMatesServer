@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import * as strings from '../../utils/strings';
+import { AppConfig } from 'config';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
@@ -47,10 +48,13 @@ export class AuthGuard implements CanActivate {
   private async verifyAndSetUser(request: Request, token: string): Promise<boolean> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
+        secret: AppConfig.JWT_SECRET,
       });
       request['user'] = payload;
-    } catch {
+    } catch (error){
+      console.error('Verification Error:', error.message);
+
+      console.log("oh now!")
       throw new UnauthorizedException();
     }
     return true;
@@ -69,8 +73,12 @@ export class AuthGuard implements CanActivate {
       const cookieArray = cookies.split(';').map(cookie => cookie.trim());
       const tokenCookie = cookieArray.find(cookie => cookie.startsWith('access_token='));
       if (tokenCookie) {
+        console.log("SDsdf")
+        console.log(tokenCookie)
         return tokenCookie.split('=')[1];
       }
+      console.log("nopde")
+
     }
     return undefined; 
   }

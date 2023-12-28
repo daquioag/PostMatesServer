@@ -8,16 +8,14 @@ import {
   UseGuards,
   HttpStatus,
   Req,
-  NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
 import { LoginUserDto } from './dtos/LoginUserDto';
 import { Response, Request } from 'express';
 import * as strings from '../utils/strings';
-import { JwtAuthGuard } from './utils/jet-auth.guard';
+import { JwtAuthGuard } from './utils/jwt-auth.guard';
 import { lastValueFrom } from 'rxjs';
+import { Public } from './utils/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,27 +25,35 @@ export class AuthController {
   // but interact with the NATS service
   // need to inject NATS service in this class
   @Post('login')
+  @Public()
   async loginUser(
     @Res({ passthrough: true }) res: Response,
     @Body() loginUserDto: LoginUserDto,
   ) {
     try {
-      const access_token = await lastValueFrom(
-        this.natsClient.send({ cmd: 'validateUser' }, loginUserDto),
-      );
+      console.log(loginUserDto)
 
-      res
-        .cookie(access_token, {
+      const access_token = await lastValueFrom(
+        this.natsClient.send( 
+          {cmd : 'validateUser'}, 
+          loginUserDto),
+        )
+        
+      console.log('User login attempt:', loginUserDto.email);
+      console.log(access_token)
+      res.cookie('access_token', access_token, {
           httpOnly: true,
           secure: false,
           sameSite: 'lax', // change to lax for local testing and none for hosting
-        })
-        .send({ status: 'Ok', success: true });
-    } catch (error) {
-      console.log(error)
-      res
-        .send({ message: strings.INVALID_CREDENTIALS, status: false });
-    }
+        }).send({ status: 'Ok', access_token, success: true });
+    } catch (error)  {
+          // Handle other exceptions
+          console.error(strings.INVALID_CREDENTIALS);
+          res
+            .status(HttpStatus.UNAUTHORIZED)
+            .send({ message: strings.INTERNAL_SERVER_ERROR, status: false });
+        }
+    
   }
 
   @Get('profile')
@@ -56,12 +62,13 @@ export class AuthController {
     return req.user;
   }
 
+  @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     if (req.user) {
       const user = req.user;
       // Expire the cookie by setting it to an expired date
       res.cookie('access_token', '', { expires: new Date(0) });
-    }
-    return { message: strings.LOGGED_OUT };
+    }   
+     return {message: strings.LOGGED_OUT};
   }
 }
