@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Inject, Body, Param } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreateUserDto } from "./dtos/CreateUser.dto";
+import { Public } from "src/auth/utils/auth.guard";
 
 @Controller('users')
 export class UsersController {
@@ -10,6 +11,7 @@ export class UsersController {
     // but interact with the NATS service
     // need to inject NATS service in this class
     @Post('create')
+    @Public()
     createUser(@Body() createUserDto: CreateUserDto) {
         console.log(createUserDto)
          return this.natsClient.send({cmd: 'createUser'}, createUserDto)

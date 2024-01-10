@@ -20,7 +20,6 @@ import { Public } from './utils/auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(@Inject('NATS_SERVICE') private natsClient: ClientProxy) {}
-
   // not interacting with a database in this controller
   // but interact with the NATS service
   // need to inject NATS service in this class
@@ -39,19 +38,17 @@ export class AuthController {
           loginUserDto),
         )
         
-      console.log('User login attempt:', loginUserDto.email);
-      console.log(access_token)
       res.cookie('access_token', access_token, {
           httpOnly: true,
           secure: false,
           sameSite: 'lax', // change to lax for local testing and none for hosting
-        }).send({ status: 'Ok', access_token, success: true });
+        }).send({ status: 'Ok', success: true });
     } catch (error)  {
           // Handle other exceptions
           console.error(strings.INVALID_CREDENTIALS);
           res
             .status(HttpStatus.UNAUTHORIZED)
-            .send({ message: strings.INTERNAL_SERVER_ERROR, status: false });
+            .send({ message: strings.INVALID_CREDENTIALS, status: false });
         }
     
   }
