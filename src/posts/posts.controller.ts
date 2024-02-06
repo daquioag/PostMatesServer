@@ -16,7 +16,7 @@ export class PostsController {
         // we can return this if you want a resposne
         this.natsClient.emit('createPost', createPostDto)
     }
-//asasd
+    
     @Get('getPosts')
     async getAllPosts() {
         // we can return this if you want a resposne
