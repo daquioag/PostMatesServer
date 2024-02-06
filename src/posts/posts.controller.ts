@@ -1,7 +1,8 @@
-import { Controller, Post, Inject, Body, Get, Param } from "@nestjs/common";
+import { Controller, Post, Inject, Body, Get, Param, UseGuards } from "@nestjs/common";
 import { ClientProxy } from "@nestjs/microservices";
 import { CreatePostDto } from "./dtos/CreatePost.dto";
 import { lastValueFrom } from "rxjs";
+import { JwtAuthGuard } from "src/auth/utils/jwt-auth.guard";
 
 @Controller('posts')
 export class PostsController {
@@ -15,12 +16,17 @@ export class PostsController {
         // we can return this if you want a resposne
         this.natsClient.emit('createPost', createPostDto)
     }
-
+//asasd
     @Get('getPosts')
-    getAllPosts() {
+    async getAllPosts() {
         // we can return this if you want a resposne
         console.log("trying to get all posts");
-        return this.natsClient.send({cmd: 'fetchPosts'}, {})
+        const posts = await lastValueFrom(
+          this.natsClient.send({cmd: 'fetchPosts'}, {}),
+        );
+        console.log(posts)
+
+        return posts
     }
 
     @Get(':id')
