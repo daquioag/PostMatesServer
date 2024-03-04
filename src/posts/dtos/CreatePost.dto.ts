@@ -10,6 +10,4 @@ export class CreatePostDto {
   @IsNotEmpty()
   content: string;
 
-  userId: number;
-
 }

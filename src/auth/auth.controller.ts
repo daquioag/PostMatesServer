@@ -36,7 +36,7 @@ export class AuthController {
         this.natsClient.send( 
           {cmd : 'validateUser'}, 
           loginUserDto),
-        )
+        ) 
         
       res.cookie('access_token', access_token, {
           httpOnly: true,
@@ -62,7 +62,6 @@ export class AuthController {
   @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     if (req.user) {
-      const user = req.user;
       // Expire the cookie by setting it to an expired date
       res.cookie('access_token', '', { expires: new Date(0) });
     }   

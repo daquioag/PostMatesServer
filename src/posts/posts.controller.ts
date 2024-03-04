@@ -1,8 +1,9 @@
-import { Controller, Post, Inject, Body, Get, Param, UseGuards } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
+import { Controller, Post, Inject, Body, Get, Param, UseGuards, Req} from "@nestjs/common";
+import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { CreatePostDto } from "./dtos/CreatePost.dto";
 import { lastValueFrom } from "rxjs";
 import { JwtAuthGuard } from "src/auth/utils/jwt-auth.guard";
+import { Response, Request } from 'express';
 
 @Controller('posts')
 export class PostsController {
@@ -12,11 +13,20 @@ export class PostsController {
     // but interact with the NATS service
     // need to inject NATS service in this class
     @Post('createPost')
-    createPost(@Body() createPostDto: CreatePostDto) {
-        // we can return this if you want a resposne
-        this.natsClient.emit('createPost', createPostDto)
+    createPost(@Req() req: Request, @Body() createPostDto: CreatePostDto) {
+      try {
+        
+        const userId: number = (req.user as any).sub;
+
+        this.natsClient.emit('createPost', { ...createPostDto, userId });
+        return { message: "Post created", success: true,};
+      } catch (error) {
+        // Handle the error here
+        console.error('Error creating post:', error.message);
+        throw new RpcException('Failed to create post. Please try again.');
+      }
     }
-    
+
     @Get('getPosts')
     async getAllPosts() {
         // we can return this if you want a resposne
